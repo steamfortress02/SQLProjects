@@ -28,15 +28,16 @@ class SignInPage(tk.Frame):
 
         self.username_entry = tk.Entry(self)
         self.password_entry = tk.Entry(self, show="*")
-        self.username_entry.grid(row=0, column=1, padx=10, pady=8, sticky="ew")
-        self.password_entry.grid(row=1, column=1, padx=10, pady=8, sticky="ew")
+        self.username_entry.grid(row=0, column=1, padx=10, pady=8,sticky="ew")
+        self.password_entry.grid(row=1, column=1, padx=10, pady=8,sticky="ew")
 
         # Buttons
         tk.Button(self, text="Sign In", width=10, command=self.sign_in).grid(row=2, column=0, columnspan=2, pady=10)
-        tk.Button(self, text="Exit App", width=10, command=controller.destroy).grid(row=3, column=0, columnspan=2)
+        tk.Button(self, text="Sign Up", width=10, command=lambda: controller.show_frame("SignUpPage")).grid(row=3, column=0, columnspan=2, pady=10)
+        tk.Button(self, text="Exit App", width=10, command=controller.destroy).grid(row=4, column=0, columnspan=2, pady=10)
 
         self.status_label = tk.Label(self, text="", fg="green")
-        self.status_label.grid(row=4, column=0, columnspan=2, pady=10)
+        self.status_label.grid(row=5, column=0, columnspan=2, pady=10)
 
         self.columnconfigure(1, weight=1)
         self.username_entry.focus()
@@ -54,11 +55,3 @@ class SignInPage(tk.Frame):
     def sign_in(self):
         # Sign in method to validate user credentials against the MySQL database.
         return
-
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    root.title("Sign In")
-    app = SignInPage(root, root)
-    app.pack(fill="both", expand=True, padx=20, pady=20)
-    root.mainloop()
