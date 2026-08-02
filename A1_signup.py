@@ -20,7 +20,7 @@ class SignUpPage(tk.Frame):
         self.controller = controller
         
         # Set window size
-        controller.geometry("500x600")
+        controller.geometry("400x400")
 
         # Entry fields and labels
         tk.Label(self, text="Username:").grid(row=0, column=0, sticky="w", padx=10, pady=8)
@@ -31,13 +31,13 @@ class SignUpPage(tk.Frame):
         tk.Label(self, text="Email:").grid(row=5, column=0, sticky="w", padx=10, pady=8)
         tk.Label(self, text="Phone Number:").grid(row=6, column=0, sticky="w", padx=10, pady=8)
 
-        self.username_entry = tk.Entry(self)
-        self.password_entry = tk.Entry(self, show="*")
-        self.confirm_password_entry = tk.Entry(self, show="*")
-        self.first_name_entry = tk.Entry(self)
-        self.last_name_entry = tk.Entry(self)
-        self.email_entry = tk.Entry(self)
-        self.phone_number_entry = tk.Entry(self)
+        self.username_entry = tk.Entry(self, width=40)
+        self.password_entry = tk.Entry(self, show="*", width=40)
+        self.confirm_password_entry = tk.Entry(self, show="*", width=40)
+        self.first_name_entry = tk.Entry(self, width=40)
+        self.last_name_entry = tk.Entry(self, width=40)
+        self.email_entry = tk.Entry(self, width=40)
+        self.phone_number_entry = tk.Entry(self, width=40)
         self.username_entry.grid(row=0, column=1, padx=10, pady=8, sticky="ew")
         self.password_entry.grid(row=1, column=1, padx=10, pady=8, sticky="ew")
         self.confirm_password_entry.grid(row=2, column=1, padx=10, pady=8, sticky="ew")
@@ -49,7 +49,7 @@ class SignUpPage(tk.Frame):
         # Buttons
         tk.Button(self, text="Sign Up", width=10, command=self.sign_up).grid(row=7, column=0, columnspan=2, pady=10)
         tk.Button(self, text="Back to Sign In", width=15, command=lambda: controller.show_frame("SignInPage")).grid(row=8, column=0, columnspan=2, pady=10)
-        tk.Button(self, text="Exit App", width=10, command=controller.destroy).grid(row=9, column=0, columnspan=2)
+        tk.Button(self, text="Exit App", width=10, command=controller.destroy).grid(row=9, column=0, columnspan=2, pady=10)
 
         self.status_label = tk.Label(self, text="", fg="green")
         self.status_label.grid(row=10, column=0, columnspan=2, pady=10)

@@ -20,16 +20,16 @@ class SignInPage(tk.Frame):
         self.controller = controller
         
         # Set window size
-        controller.geometry("500x400")
+        controller.geometry("400x400")
 
         # Entry fields and labels
         tk.Label(self, text="Username:").grid(row=0, column=0, sticky="w", padx=10, pady=8)
         tk.Label(self, text="Password:").grid(row=1, column=0, sticky="w", padx=10, pady=8)
 
-        self.username_entry = tk.Entry(self)
-        self.password_entry = tk.Entry(self, show="*")
-        self.username_entry.grid(row=0, column=1, padx=10, pady=8,sticky="ew")
-        self.password_entry.grid(row=1, column=1, padx=10, pady=8,sticky="ew")
+        self.username_entry = tk.Entry(self, width=35)
+        self.password_entry = tk.Entry(self, show="*", width=35)
+        self.username_entry.grid(row=0, column=1, padx=10, pady=8, sticky="ew")
+        self.password_entry.grid(row=1, column=1, padx=10, pady=8, sticky="ew")
 
         # Buttons
         tk.Button(self, text="Sign In", width=10, command=self.sign_in).grid(row=2, column=0, columnspan=2, pady=10)
