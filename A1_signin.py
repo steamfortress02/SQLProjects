@@ -54,4 +54,34 @@ class SignInPage(tk.Frame):
 
     def sign_in(self):
         # Sign in method to validate user credentials against the MySQL database.
-        return
+        username = self.username_entry.get().strip()
+        password = self.password_entry.get().strip()
+
+        if not username or not password:
+            self.status_label.config(text="Enter username and password.", fg="red")
+            return
+
+        try:
+            conn = self.connect_mysql()
+            cursor = conn.cursor()
+            # Retrieve stored password for the username (assumes plain-text or pre-hashed matching).
+            cursor.execute("SELECT password FROM users WHERE username = %s", (username,))
+            row = cursor.fetchone()
+            cursor.close()
+            conn.close()
+
+            if not row:
+                self.status_label.config(text="Invalid username or password.", fg="red")
+                return
+
+            stored_password = row[0]
+            if stored_password == password:
+                self.status_label.config(text="Login successful.", fg="green")
+                # OPEN A PAGE WITH THE DETAILS OF THE USER
+            else:
+                self.status_label.config(text="Invalid username or password.", fg="red")
+
+        except mysql.connector.Error as exc:
+            self.status_label.config(text=f"MySQL error: {exc}", fg="red")
+        except Exception as exc:
+            self.status_label.config(text=f"Error: {exc}", fg="red")
