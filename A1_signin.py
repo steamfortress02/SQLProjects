@@ -63,9 +63,12 @@ class SignInPage(tk.Frame):
 
         try:
             conn = self.connect_mysql()
-            cursor = conn.cursor()
-            # Retrieve stored password for the username (assumes plain-text or pre-hashed matching).
-            cursor.execute("SELECT password FROM users WHERE username = %s", (username,))
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute(
+                "SELECT username, password, first_name, last_name, email, phone_number "
+                "FROM users WHERE username = %s",
+                (username,),
+            )
             row = cursor.fetchone()
             cursor.close()
             conn.close()
@@ -74,10 +77,19 @@ class SignInPage(tk.Frame):
                 self.status_label.config(text="Invalid username or password.", fg="red")
                 return
 
-            stored_password = row[0]
+            stored_password = row["password"]
             if stored_password == password:
                 self.status_label.config(text="Login successful.", fg="green")
-                # OPEN A PAGE WITH THE DETAILS OF THE USER
+                user_data = {
+                    "username": row.get("username", ""),
+                    "password": stored_password,
+                    "first_name": row.get("first_name", ""),
+                    "last_name": row.get("last_name", ""),
+                    "email": row.get("email", ""),
+                    "phone_number": row.get("phone_number", ""),
+                }
+                self.controller.set_user_details(user_data)
+                self.controller.show_frame("DetailsPage")
             else:
                 self.status_label.config(text="Invalid username or password.", fg="red")
 
