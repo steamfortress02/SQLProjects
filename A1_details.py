@@ -52,7 +52,7 @@ class DetailsPage(tk.Frame):
     def set_user_details(self, details):
         self.username_value.config(text=details.get("username", ""))
         self.password_value.config(text=details.get("password", ""))
-        self.first_name_value.config(text=details.get("first_name", ""))
-        self.last_name_value.config(text=details.get("last_name", ""))
+        self.first_name_value.config(text=details.get("firstName", details.get("first_name", "")))
+        self.last_name_value.config(text=details.get("lastName", details.get("last_name", "")))
         self.email_value.config(text=details.get("email", ""))
-        self.phone_number_value.config(text=details.get("phone_number", ""))
+        self.phone_number_value.config(text=details.get("phone", details.get("phone_number", "")))

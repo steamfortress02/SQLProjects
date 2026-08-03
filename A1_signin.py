@@ -70,22 +70,35 @@ class SignInPage(tk.Frame):
 
         try:
             conn = self.connect_mysql()
-            cursor = conn.cursor()
-            
-            # Using parameterized query to prevent SQL Injection
-            cursor.execute("SELECT password FROM users WHERE username = %s", (username,))
+            cursor = conn.cursor(dictionary=True)
+
+            # Using parameterized query to prevent SQL injection and fetch user details.
+            cursor.execute(
+                "SELECT username, password, firstName, lastName, email, phone FROM users WHERE username = %s",
+                (username,),
+            )
             row = cursor.fetchone()
-            
+
             if not row:
                 self.status_label.config(text="Invalid username or password.", fg="red")
                 return
 
-            stored_password = row[0]
+            stored_password = row["password"]
             if verify_password(stored_password, password):
-                self.status_label.config(text="Login successful.", fg="green")
+                self.status_label.config(text="", fg="green")
                 self.username_entry.delete(0, tk.END)
                 self.password_entry.delete(0, tk.END)
-                # OPEN A PAGE WITH THE DETAILS OF THE USER
+
+                user_data = {
+                    "username": row.get("username", ""),
+                    "password": "********",
+                    "firstName": row.get("firstName", ""),
+                    "lastName": row.get("lastName", ""),
+                    "email": row.get("email", ""),
+                    "phone": row.get("phone", ""),
+                }
+                self.controller.set_user_details(user_data)
+                self.controller.show_frame("DetailsPage")
             else:
                 self.status_label.config(text="Invalid username or password.", fg="red")
 

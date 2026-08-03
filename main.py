@@ -16,7 +16,7 @@ class App(tk.Tk):
 
         self.frames = {}
         # Load and stack both frames
-        for FrameClass in (SignInPage, SignUpPage):
+        for FrameClass in (SignInPage, SignUpPage, DetailsPage):
             page_name = FrameClass.__name__
             frame = FrameClass(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -28,6 +28,11 @@ class App(tk.Tk):
         frame = self.frames.get(page_name)
         if frame:
             frame.tkraise()
+
+    def set_user_details(self, user_data):
+        details_page = self.frames.get("DetailsPage")
+        if details_page:
+            details_page.set_user_details(user_data)
 
 if __name__ == "__main__":
     app = App()
