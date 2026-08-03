@@ -1,8 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 import mysql.connector
+import hashlib
 
-# Anthony Langers data base config
+# Database config
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
@@ -10,6 +11,15 @@ DB_CONFIG = {
     "database": "signin_db",
 }
 
+def verify_password(stored_password, provided_password):
+    """Verifies a provided password against the stored hashed password."""
+    try:
+        salt_hex, key_hex = stored_password.split(':')
+        salt = bytes.fromhex(salt_hex)
+        new_key = hashlib.pbkdf2_hmac('sha256', provided_password.encode('utf-8'), salt, 100000)
+        return key_hex == new_key.hex()
+    except ValueError:
+        return False
 
 class SignInPage(tk.Frame):
     '''
@@ -19,9 +29,6 @@ class SignInPage(tk.Frame):
         super().__init__(parent)
         self.controller = controller
         
-        # Set window size
-        controller.geometry("400x400")
-
         # Entry fields and labels
         tk.Label(self, text="Username:").grid(row=0, column=0, sticky="w", padx=10, pady=8)
         tk.Label(self, text="Password:").grid(row=1, column=0, sticky="w", padx=10, pady=8)
@@ -55,7 +62,7 @@ class SignInPage(tk.Frame):
     def sign_in(self):
         # Sign in method to validate user credentials against the MySQL database.
         username = self.username_entry.get().strip()
-        password = self.password_entry.get().strip()
+        password = self.password_entry.get()
 
         if not username or not password:
             self.status_label.config(text="Enter username and password.", fg="red")
@@ -63,33 +70,22 @@ class SignInPage(tk.Frame):
 
         try:
             conn = self.connect_mysql()
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute(
-                "SELECT username, password, first_name, last_name, email, phone_number "
-                "FROM users WHERE username = %s",
-                (username,),
-            )
+            cursor = conn.cursor()
+            
+            # Using parameterized query to prevent SQL Injection
+            cursor.execute("SELECT password FROM users WHERE username = %s", (username,))
             row = cursor.fetchone()
-            cursor.close()
-            conn.close()
-
+            
             if not row:
                 self.status_label.config(text="Invalid username or password.", fg="red")
                 return
 
-            stored_password = row["password"]
-            if stored_password == password:
+            stored_password = row[0]
+            if verify_password(stored_password, password):
                 self.status_label.config(text="Login successful.", fg="green")
-                user_data = {
-                    "username": row.get("username", ""),
-                    "password": stored_password,
-                    "first_name": row.get("first_name", ""),
-                    "last_name": row.get("last_name", ""),
-                    "email": row.get("email", ""),
-                    "phone_number": row.get("phone_number", ""),
-                }
-                self.controller.set_user_details(user_data)
-                self.controller.show_frame("DetailsPage")
+                self.username_entry.delete(0, tk.END)
+                self.password_entry.delete(0, tk.END)
+                # OPEN A PAGE WITH THE DETAILS OF THE USER
             else:
                 self.status_label.config(text="Invalid username or password.", fg="red")
 
@@ -97,3 +93,7 @@ class SignInPage(tk.Frame):
             self.status_label.config(text=f"MySQL error: {exc}", fg="red")
         except Exception as exc:
             self.status_label.config(text=f"Error: {exc}", fg="red")
+        finally:
+            if 'conn' in locals() and conn.is_connected():
+                cursor.close()
+                conn.close()
