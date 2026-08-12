@@ -28,7 +28,8 @@ class SignInPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
-        
+
+
         # Entry fields and labels
         tk.Label(self, text="Username:").grid(row=0, column=0, sticky="w", padx=10, pady=8)
         tk.Label(self, text="Password:").grid(row=1, column=0, sticky="w", padx=10, pady=8)

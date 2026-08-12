@@ -25,6 +25,7 @@ class SignUpPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
+
         
         # Entry fields and labels
         tk.Label(self, text="Username:").grid(row=0, column=0, sticky="w", padx=10, pady=8)
@@ -51,13 +52,16 @@ class SignUpPage(tk.Frame):
         self.email_entry.grid(row=5, column=1, padx=10, pady=8, sticky="ew")
         self.phone_number_entry.grid(row=6, column=1, padx=10, pady=8, sticky="ew")
 
-        # Buttons
-        tk.Button(self, text="Sign Up", width=10, command=self.sign_up).grid(row=7, column=0, columnspan=2, pady=10)
-        tk.Button(self, text="Back to Sign In", width=15, command=lambda: self.go_back()).grid(row=8, column=0, columnspan=2, pady=10)
-        tk.Button(self, text="Exit App", width=10, command=controller.destroy).grid(row=9, column=0, columnspan=2, pady=10)
-
         self.status_label = tk.Label(self, text="", fg="green")
-        self.status_label.grid(row=10, column=0, columnspan=2, pady=10)
+        self.status_label.grid(row=7, column=0, columnspan=2, pady=10)
+        self.status_label.config(text="Create Account")
+
+        # Buttons
+        tk.Button(self, text="Sign Up", width=10, command=self.sign_up).grid(row=8, column=0, columnspan=2, pady=10)
+        tk.Button(self, text="Back to Sign In", width=15, command=lambda: self.go_back()).grid(row=9, column=0, columnspan=2, pady=10)
+        tk.Button(self, text="Exit App", width=10, command=controller.destroy).grid(row=10, column=0, columnspan=2, pady=10)
+
+        
 
         self.columnconfigure(1, weight=1)
         self.username_entry.focus()

@@ -8,8 +8,7 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Sign In")
-        self.geometry("400x500")
-        self.resizable(False, False)
+        self.geometry("400x700")
 
         container = tk.Frame(self)
         container.pack(fill="both", expand=True)
