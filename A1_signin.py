@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 import mysql.connector
 import hashlib
 
@@ -10,6 +10,22 @@ DB_CONFIG = {
     "password": "root",
     "database": "signin_db",
 }
+
+class UserCurrent:
+    """Holds the currently signed-in user's username"""
+    _current_user_id = None  # this stores the username string
+
+    @staticmethod
+    def set_current_user_id(uid):
+        UserCurrent._current_user_id = uid
+
+    @staticmethod
+    def get_current_user_id():
+        return UserCurrent._current_user_id
+
+    @staticmethod
+    def clear():
+        UserCurrent._current_user_id = None
 
 def verify_password(stored_password, provided_password):
     """Verifies a provided password against the stored hashed password."""
@@ -29,27 +45,35 @@ class SignInPage(tk.Frame):
         super().__init__(parent)
         self.controller = controller
 
+        
+        # container fills the window; place an inner content frame slightly right of center
+        center = tk.Frame(self)
+        center.pack(fill="both", expand=True)
+        content = tk.Frame(center)
+        content.place(relx=0.6, rely=0.45, anchor="center")
 
-        # Entry fields and labels
-        tk.Label(self, text="Username:").grid(row=0, column=0, sticky="w", padx=10, pady=8)
-        tk.Label(self, text="Password:").grid(row=1, column=0, sticky="w", padx=10, pady=8)
+        # Entry fields and labels (placed inside content frame)
+        tk.Label(content, text="Username:").grid(row=0, column=0, sticky="e", padx=10, pady=8)
+        tk.Label(content, text="Password:").grid(row=1, column=0, sticky="e", padx=10, pady=8)
 
-        self.username_entry = tk.Entry(self, width=35)
-        self.password_entry = tk.Entry(self, show="*", width=35)
+        self.username_entry = tk.Entry(content, width=35)
+        self.password_entry = tk.Entry(content, show="*", width=35)
         self.username_entry.grid(row=0, column=1, padx=10, pady=8, sticky="ew")
         self.password_entry.grid(row=1, column=1, padx=10, pady=8, sticky="ew")
 
-        # Buttons
-        tk.Button(self, text="Sign In", width=10, command=self.sign_in).grid(row=2, column=0, columnspan=2, pady=10)
-        tk.Button(self, text="Sign Up", width=10, command=lambda: controller.show_frame("SignUpPage")).grid(row=3, column=0, columnspan=2, pady=10)
-        tk.Button(self, text="Exit App", width=10, command=controller.destroy).grid(row=4, column=0, columnspan=2, pady=10)
+        # Buttons (stacked vertically)
+        btn_frame = tk.Frame(content)
+        btn_frame.grid(row=2, column=0, columnspan=2, pady=10)
+        tk.Button(btn_frame, text="Sign In", width=10, command=self.sign_in).grid(row=0, column=0, pady=4)
+        tk.Button(btn_frame, text="Sign Up", width=10, command=lambda: controller.show_frame("SignUpPage")).grid(row=1, column=0, pady=4)
+        tk.Button(btn_frame, text="Exit App", width=10, command=controller.destroy).grid(row=2, column=0, pady=4)
 
-        self.status_label = tk.Label(self, text="", fg="green")
-        self.status_label.grid(row=5, column=0, columnspan=2, pady=10)
+        self.status_label = tk.Label(center, text="", fg="green")
+        self.status_label.grid(row=3, column=0, columnspan=2, pady=10)
 
-        self.columnconfigure(1, weight=1)
+        # ensure the content entry column can expand horizontally if resized
+        content.columnconfigure(1, weight=1)
         self.username_entry.focus()
-
 
     def connect_mysql(self):
         # Connect to the MySQL database using the provided configuration.
@@ -69,6 +93,8 @@ class SignInPage(tk.Frame):
             self.status_label.config(text="Enter username and password.", fg="red")
             return
 
+        conn = None
+        cursor = None
         try:
             conn = self.connect_mysql()
             cursor = conn.cursor(dictionary=True)
@@ -86,6 +112,9 @@ class SignInPage(tk.Frame):
 
             stored_password = row["password"]
             if verify_password(stored_password, password):
+                # store current username for other modules to use
+                UserCurrent.set_current_user_id(row.get("username"))
+
                 self.status_label.config(text="", fg="green")
                 self.username_entry.delete(0, tk.END)
                 self.password_entry.delete(0, tk.END)
@@ -98,8 +127,12 @@ class SignInPage(tk.Frame):
                     "email": row.get("email", ""),
                     "phone": row.get("phone", ""),
                 }
-                self.controller.set_user_details(user_data)
-                self.controller.show_frame("DetailsPage")
+                # show the UserPage and ask it to refresh its items
+                self.controller.show_frame("UserPage")
+                user_page = getattr(self.controller, "frames", {}).get("UserPage")
+                if user_page and hasattr(user_page, "refresh_items"):
+                    user_page.refresh_items()
+
             else:
                 self.status_label.config(text="Invalid username or password.", fg="red")
 
@@ -108,6 +141,13 @@ class SignInPage(tk.Frame):
         except Exception as exc:
             self.status_label.config(text=f"Error: {exc}", fg="red")
         finally:
-            if 'conn' in locals() and conn.is_connected():
-                cursor.close()
-                conn.close()
+            try:
+                if cursor:
+                    cursor.close()
+            except Exception:
+                pass
+            if conn:
+                try:
+                    conn.close()
+                except Exception:
+                    pass

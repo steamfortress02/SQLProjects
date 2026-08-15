@@ -2,20 +2,22 @@ import tkinter as tk
 from tkinter import ttk
 from A1_signin import SignInPage
 from A1_signup import SignUpPage
-from A1_details import DetailsPage
+from A2_user_page import UserPage
+from A2_home_page import HomePage
 
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Sign In")
-        self.geometry("400x700")
+        self.geometry("900x650")
+        self.minsize(700, 480)
 
         container = tk.Frame(self)
         container.pack(fill="both", expand=True)
 
         self.frames = {}
-        # Load and stack both frames
-        for FrameClass in (SignInPage, SignUpPage, DetailsPage):
+        # Load and stack frames
+        for FrameClass in (SignInPage, SignUpPage, UserPage, HomePage):
             page_name = FrameClass.__name__
             frame = FrameClass(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -29,9 +31,9 @@ class App(tk.Tk):
             frame.tkraise()
 
     def set_user_details(self, user_data):
-        details_page = self.frames.get("DetailsPage")
-        if details_page:
-            details_page.set_user_details(user_data)
+        user_page = self.frames.get("UserPage")
+        if user_page:
+            user_page.set_user_details(user_data)
 
 if __name__ == "__main__":
     app = App()
