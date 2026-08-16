@@ -211,16 +211,9 @@ class UserPage(tk.Frame):
                          font=("Times New Roman", 20), anchor="center")
         title.pack(fill="x", side="top")
 
-        left_banner = tk.Frame(self, width=50, bg="#312b2b")
-        left_banner.pack(side="left", fill="y")
-
-        right_banner = tk.Frame(self, width=50, bg="#312b2b")
-        right_banner.pack(side="right", fill="y")
-
         # Create scrollable area
         scroll_container = tk.Frame(self, bg="#2a6cc8")
-        # pack on the left so it expands into the space between the left/right banners
-        scroll_container.pack(side="left", fill="both", expand=True)
+        scroll_container.pack(side="top", fill="both", expand=True)
 
         canvas = tk.Canvas(scroll_container, bg="#205fb7", highlightthickness=0)
         canvas.pack(side="left", fill="both", expand=True)
@@ -272,6 +265,13 @@ class UserPage(tk.Frame):
         price_text = f"${price}" if price is not None else "N/A"
         price_label = ttk.Label(frame, text=price_text, font=("Times New Roman", 14, "bold"), wraplength=200)
         price_label.grid(row=1, column=0, sticky="s")
+
+        frame.bind("<Button-1>", lambda event, item=item: self._open_item_popup(item))
+        frame.configure(cursor="hand2")
+
+    def _open_item_popup(self, item):
+        from A2_item_info_popup import ItemInfoPopup
+        ItemInfoPopup(self, item)
 
     def prompt_new_item(self):
         """Open a dialog to collect new item details and add to InventoryDatabase."""

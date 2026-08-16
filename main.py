@@ -12,8 +12,13 @@ class App(tk.Tk):
         self.geometry("900x650")
         self.minsize(700, 480)
 
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
         container = tk.Frame(self)
-        container.pack(fill="both", expand=True)
+        container.grid(row=0, column=0, sticky="nsew")
+        container.grid_rowconfigure(0, weight=1)
+        container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
         # Load and stack frames

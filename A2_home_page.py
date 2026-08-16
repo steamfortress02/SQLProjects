@@ -38,19 +38,12 @@ class HomePage(tk.Frame):
 
         tk.Button(filter_frame, text="Apply", command=self.refresh_items).pack(side="left", padx=6)
 
-        # Title
         title = tk.Label(self, text="All Items", bg="#195379", fg="white",
                          font=("Times New Roman", 20), anchor="center")
         title.pack(fill="x", side="top")
 
-        # Main banners and scroll area
-        left_banner = tk.Frame(self, width=50, bg="#312b2b")
-        left_banner.pack(side="left", fill="y")
-        right_banner = tk.Frame(self, width=50, bg="#312b2b")
-        right_banner.pack(side="right", fill="y")
-
         self.scroll_container = tk.Frame(self, bg="#2a6cc8")
-        self.scroll_container.pack(side="left", fill="both", expand=True)
+        self.scroll_container.pack(side="top", fill="both", expand=True)
 
         self.canvas = tk.Canvas(self.scroll_container, bg="#205fb7", highlightthickness=0)
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -126,3 +119,10 @@ class HomePage(tk.Frame):
 
             poster_label = ttk.Label(frame, text=f"By: {item.poster_username}", font=("Times New Roman", 9))
             poster_label.grid(row=2, column=0, sticky="s")
+
+            frame.bind("<Button-1>", lambda event, item=item: self._open_item_popup(item))
+            frame.configure(cursor="hand2")
+
+    def _open_item_popup(self, item):
+        from A2_item_info_popup import ItemInfoPopup
+        ItemInfoPopup(self, item)

@@ -46,33 +46,23 @@ class SignInPage(tk.Frame):
         self.controller = controller
 
         
-        # container fills the window; place an inner content frame slightly right of center
-        center = tk.Frame(self)
-        center.pack(fill="both", expand=True)
-        content = tk.Frame(center)
-        content.place(relx=0.6, rely=0.45, anchor="center")
+        # Entry fields and labels
+        tk.Label(self, text="Username:").grid(row=0, column=0, sticky="w", padx=10, pady=8)
+        tk.Label(self, text="Password:").grid(row=1, column=0, sticky="w", padx=10, pady=8)
 
-        # Entry fields and labels (placed inside content frame)
-        tk.Label(content, text="Username:").grid(row=0, column=0, sticky="e", padx=10, pady=8)
-        tk.Label(content, text="Password:").grid(row=1, column=0, sticky="e", padx=10, pady=8)
-
-        self.username_entry = tk.Entry(content, width=35)
-        self.password_entry = tk.Entry(content, show="*", width=35)
+        self.username_entry = tk.Entry(self, width=40)
+        self.password_entry = tk.Entry(self, show="*", width=40)
         self.username_entry.grid(row=0, column=1, padx=10, pady=8, sticky="ew")
         self.password_entry.grid(row=1, column=1, padx=10, pady=8, sticky="ew")
 
-        # Buttons (stacked vertically)
-        btn_frame = tk.Frame(content)
-        btn_frame.grid(row=2, column=0, columnspan=2, pady=10)
-        tk.Button(btn_frame, text="Sign In", width=10, command=self.sign_in).grid(row=0, column=0, pady=4)
-        tk.Button(btn_frame, text="Sign Up", width=10, command=lambda: controller.show_frame("SignUpPage")).grid(row=1, column=0, pady=4)
-        tk.Button(btn_frame, text="Exit App", width=10, command=controller.destroy).grid(row=2, column=0, pady=4)
+        self.status_label = tk.Label(self, text="", fg="green")
+        self.status_label.grid(row=2, column=0, columnspan=2, pady=10)
 
-        self.status_label = tk.Label(center, text="", fg="green")
-        self.status_label.grid(row=3, column=0, columnspan=2, pady=10)
+        tk.Button(self, text="Sign In", width=10, command=self.sign_in).grid(row=3, column=0, columnspan=2, pady=10)
+        tk.Button(self, text="Sign Up", width=10, command=lambda: controller.show_frame("SignUpPage")).grid(row=4, column=0, columnspan=2, pady=10)
+        tk.Button(self, text="Exit App", width=10, command=controller.destroy).grid(row=5, column=0, columnspan=2, pady=10)
 
-        # ensure the content entry column can expand horizontally if resized
-        content.columnconfigure(1, weight=1)
+        self.columnconfigure(1, weight=1)
         self.username_entry.focus()
 
     def connect_mysql(self):
