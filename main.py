@@ -2,27 +2,20 @@ import tkinter as tk
 from tkinter import ttk
 from A1_signin import SignInPage
 from A1_signup import SignUpPage
-from A2_user_page import UserPage
-from A2_home_page import HomePage
+from DashboardPage import DashboardPage
 
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Sign In")
-        self.geometry("900x650")
-        self.minsize(700, 480)
-
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
+        self.title("Online Marketplace")
+        self.geometry("500x600")
+        self.resizable(False, False)
 
         container = tk.Frame(self)
-        container.grid(row=0, column=0, sticky="nsew")
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
+        container.pack(fill="both", expand=True)
 
         self.frames = {}
-        # Load and stack frames
-        for FrameClass in (SignInPage, SignUpPage, UserPage, HomePage):
+        for FrameClass in (SignInPage, SignUpPage, DashboardPage):
             page_name = FrameClass.__name__
             frame = FrameClass(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -36,9 +29,9 @@ class App(tk.Tk):
             frame.tkraise()
 
     def set_user_details(self, user_data):
-        user_page = self.frames.get("UserPage")
-        if user_page:
-            user_page.set_user_details(user_data)
+        dash_page = self.frames.get("DashboardPage")
+        if dash_page:
+            dash_page.set_user_details(user_data)
 
 if __name__ == "__main__":
     app = App()
