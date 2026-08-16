@@ -3,7 +3,7 @@ import mysql.connector
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "1234", # Update if necessary
+    "password": "root", # Update if necessary
     "database": "signin_db",
 }
 
