@@ -38,17 +38,17 @@ def setup_database():
     )""")
     
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS review (
-        itemID INT NOT NULL,
-        username VARCHAR(45) NOT NULL,
-        rating VARCHAR(45) NOT NULL,
-        comment VARCHAR(200) NOT NULL,
-        date DATE NOT NULL,
-        PRIMARY KEY (itemID, username),
-        FOREIGN KEY (itemID) REFERENCES item(itemID) ON DELETE CASCADE,
-        FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE,
-        CHECK (rating IN ('Excellent', 'Good', 'Fair', 'Poor')),
-        CHECK (CHAR_LENGTH(comment) > 0)
+    CREATE TABLE IF NOT EXISTS reviews (
+        review_id INT AUTO_INCREMENT PRIMARY KEY,
+        item_id INT NOT NULL,
+        reviewer VARCHAR(45) NOT NULL,
+        rating VARCHAR(10) NOT NULL,
+        comment TEXT,
+        review_date DATE NOT NULL,
+        UNIQUE (item_id, reviewer), -- Enforces 1 review per item per user
+        FOREIGN KEY (item_id) REFERENCES items(item_id) ON DELETE CASCADE,
+        FOREIGN KEY (reviewer) REFERENCES users(username) ON DELETE CASCADE,
+        CHECK (rating IN ('Excellent', 'Good', 'Fair', 'Poor'))
     )""")
 
     # Create Triggers to Enforce Business Rules
@@ -66,43 +66,28 @@ def setup_database():
 
     cursor.execute("DROP TRIGGER IF EXISTS check_review_limit")
     cursor.execute("""
-    CREATE TRIGGER check_review_limit BEFORE INSERT ON review
+    CREATE TRIGGER check_review_limit BEFORE INSERT ON reviews
     FOR EACH ROW
     BEGIN
         DECLARE review_count INT;
-        DECLARE item_owner VARCHAR(45);
-
-        SELECT COUNT(*) INTO review_count
-        FROM review
-        WHERE username = NEW.username AND date = NEW.date;
-
+        DECLARE item_seller VARCHAR(45);
+        SELECT COUNT(*) INTO review_count FROM reviews WHERE reviewer = NEW.reviewer AND review_date = NEW.review_date;
         IF review_count >= 3 THEN
             SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'A user may submit at most three reviews per calendar day.';
         END IF;
-
-        SELECT poster_username INTO item_owner
-        FROM item
-        WHERE itemID = NEW.itemID;
-
-        IF item_owner = NEW.username THEN
+        
+        SELECT seller INTO item_seller FROM items WHERE item_id = NEW.item_id;
+        IF item_seller = NEW.reviewer THEN
             SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'A user cannot review their own item.';
         END IF;
     END;""")
 
     cursor.execute("DROP TRIGGER IF EXISTS prevent_review_update")
     cursor.execute("""
-    CREATE TRIGGER prevent_review_update BEFORE UPDATE ON review
+    CREATE TRIGGER prevent_review_update BEFORE UPDATE ON reviews
     FOR EACH ROW
     BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Once submitted, a review cannot be modified.';
-    END;""")
-
-    cursor.execute("DROP TRIGGER IF EXISTS prevent_review_delete")
-    cursor.execute("""
-    CREATE TRIGGER prevent_review_delete BEFORE DELETE ON review
-    FOR EACH ROW
-    BEGIN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Reviews cannot be deleted after submission.';
     END;""")
 
     print("Phase 2 database tables and triggers successfully initialized!")
