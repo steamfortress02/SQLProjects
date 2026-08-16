@@ -5,7 +5,7 @@ Authors:
     - populated DB
 
     Mohammed Shariff:
-    - db_init script which updates DB
+    - db_init script which updates DB schema and functions
     - software debugging
     - managing version control
     - dashboard querys
