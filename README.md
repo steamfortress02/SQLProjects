@@ -1,10 +1,14 @@
 Authors:
     Anthony Langer:
     - GUI
-    - sign in/sign up
-    - DB 
+    - signin and signup
+    - populated DB
 
     Mohammed Shariff:
+    - db_init script which updates DB
+    - software debugging
+    - managing version control
+    - dashboard querys
 
 To execute:
 1. Input your DB_CONFIG at the top of every file
@@ -12,4 +16,5 @@ To execute:
 3. run python main.py to run the program
 
 Software:
-Python & MySQL
+ MySQL: Version 8.0.16
+ Python: Version 3.6
